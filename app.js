@@ -8,7 +8,7 @@ var setupController = require("./api/controllers/setupController");
 var todoController = require("./api/controllers/todoController");
 
 var app = express();
-var port = process.env.PORT || 3000
+var port = process.env.PORT || 3000;
 // Cau hinh su dung cac middleware
 app.use("/public", express.static(__dirname + '/public'));
 app.use(bodyParser.json());
