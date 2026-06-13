@@ -1,4 +1,4 @@
-var Todos = require("../models/todoModel");
+var todoStore = require("../store/todoStore");
 
 module.exports = function(app) {
     app.get("/api/setupTodos", function(req, res) {
@@ -18,9 +18,7 @@ module.exports = function(app) {
             }
         ];
 
-        Todos.create(seedTodos, function (err, results) {
-            res.send(results);
-        });
+        res.send(todoStore.seed(seedTodos));
 
     });
 }

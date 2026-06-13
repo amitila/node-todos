@@ -1,9 +1,6 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var morgan = require("morgan");
-var mongoose = require("mongoose");
-
-var config = require("./config");
 var setupController = require("./api/controllers/setupController");
 var todoController = require("./api/controllers/todoController");
 
@@ -21,10 +18,6 @@ app.use(morgan("dev"));
 // cau hinh views
 app.set("view engine", "ejs");
 
-// db info
-console.log(config.getDbConnectionString());
-// connect to db
-mongoose.connect(config.getDbConnectionString(), { useNewUrlParser: true, useUnifiedTopology: true });
 setupController(app);
 todoController(app);
 

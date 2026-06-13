@@ -1,13 +1,7 @@
-var Todos = require("../models/todoModel");
+var todoStore = require("../store/todoStore");
 
 function getTodos(res) {
-    Todos.find(function (err, todos) {
-        if(err) {
-            res.status(500).json(err);
-        } else {
-            res.json(todos);
-        }
-    });
+    res.json(todoStore.findAll());
 }
 
 module.exports = function (app) {
@@ -19,13 +13,13 @@ module.exports = function (app) {
 
     // api/todo/123456
     app.get("/api/todo/:id", function (req, res) {
-        Todos.findById({_id: req.params.id}, function (err, todo) {
-            if(err) {
-                throw err;
-            } else {
-                res.json(todo);
-            }
-        });
+        var todo = todoStore.findById(req.params.id);
+
+        if (!todo) {
+            return res.status(404).json({ message: "Todo not found" });
+        }
+
+        res.json(todo);
     });
 
     // create a todo
@@ -35,13 +29,8 @@ module.exports = function (app) {
             isDone: req.body.isDone
         };
 
-        Todos.create(todo, function(err, todo) {
-            if(err) {
-               throw err; 
-            } else {
-                getTodos(res);
-            }
-        });
+        todoStore.create(todo);
+        getTodos(res);
     });
 
     // Update a todo
@@ -49,31 +38,27 @@ module.exports = function (app) {
         if(!req.body._id) {
             return res.status(500).send("ID is required");
         } else {
-            Todos.update({
-                _id: req.body._id
-            }, {
+            var updated = todoStore.update(req.body._id, {
                 text: req.body.text,
                 isDone: req.body.isDone
-            }, function(err, todo) {
-                if(err) {
-                    return res.status(500).json(err);
-                } else {
-                    getTodos(res);
-                }
             });
+
+            if (!updated) {
+                return res.status(404).json({ message: "Todo not found" });
+            }
+
+            getTodos(res);
         }
     });
 
     // delete a todo
     app.delete("/api/todo/:id", function(req, res) {
-        Todos.remove({
-            _id: req.params.id
-        }, function(err, todo) {
-            if (err) {
-                return res.status(500).json(err);
-            } else {
-                getTodos(res);
-            }
-        });
+        var removed = todoStore.remove(req.params.id);
+
+        if (!removed) {
+            return res.status(404).json({ message: "Todo not found" });
+        }
+
+        getTodos(res);
     });
 }
